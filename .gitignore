@@ -1,0 +1,14 @@
+# Binaries
+overseerr-cli
+overseerr
+*.exe
+
+# IDE
+.idea/
+.vscode/
+
+# OS files
+.DS_Store
+
+# Distribution
+dist/

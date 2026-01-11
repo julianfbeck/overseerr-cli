@@ -1,0 +1,59 @@
+version: 2
+
+builds:
+  - id: overseerr
+    main: .
+    binary: overseerr
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -X github.com/julianfbeck/overseerr-cli/cmd.version={{.Version}}
+    goos:
+      - darwin
+      - linux
+    goarch:
+      - amd64
+      - arm64
+
+universal_binaries:
+  - id: overseerr-macos
+    ids:
+      - overseerr
+    name_template: overseerr
+    replace: true
+
+archives:
+  - id: default
+    format: tar.gz
+    name_template: >-
+      {{ .ProjectName }}-{{ if eq .Os "darwin" }}macos{{ else }}{{ .Os }}{{ end }}-{{ if eq .Arch "all" }}universal{{ else }}{{ .Arch }}{{ end }}
+    files:
+      - LICENSE
+      - README.md
+
+checksum:
+  name_template: 'checksums.txt'
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+
+brews:
+  - name: overseerr
+    repository:
+      owner: julianfbeck
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    homepage: "https://github.com/julianfbeck/overseerr-cli"
+    description: "CLI for Overseerr media request management"
+    license: "MIT"
+    install: |
+      bin.install "overseerr"
+    test: |
+      system "#{bin}/overseerr", "--version"
